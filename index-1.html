@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Birthday Treasure Hunt</title>
+<style>
+:root{--paper:#f4ecd8;--ink:#2f2a24;--muted:#746b5f;--accent:#8b5e3c;--dark:#6d472d;--success:#3e6848;--error:#8a4038;--card:rgba(255,252,242,.94)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at top,rgba(255,255,255,.45),transparent 40%),linear-gradient(135deg,#e7dcc3,#f2ead8 45%,#ddd0b5);color:var(--ink);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center;align-items:center;padding:24px}
+.hunt{width:min(720px,100%)}
+.header{text-align:center;margin-bottom:18px}
+.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:.75rem;color:var(--muted);margin-bottom:8px}
+h1{margin:0;font-size:clamp(2rem,5vw,3.2rem);font-weight:normal}
+.progress{margin:20px 0 0;height:8px;border-radius:999px;background:rgba(47,42,36,.13);overflow:hidden}
+.progress-bar{width:0;height:100%;background:var(--accent);border-radius:inherit;transition:width .5s ease}
+.card{background:var(--card);border:1px solid rgba(47,42,36,.12);border-radius:18px;padding:clamp(28px,5vw,48px);box-shadow:0 18px 50px rgba(63,52,37,.14);backdrop-filter:blur(4px)}
+.stop{text-align:center;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.location{text-align:center;color:var(--accent);font-size:1.05rem;margin-bottom:22px;font-style:italic}
+.clue{font-size:clamp(1.15rem,2.3vw,1.35rem);line-height:1.85;white-space:pre-line;max-width:600px;margin:0 auto 30px}
+.form{display:flex;gap:10px;max-width:520px;margin:0 auto}
+input{flex:1;min-width:0;padding:14px 16px;border:1px solid rgba(47,42,36,.25);border-radius:10px;font:inherit;font-size:1rem;background:#fffdf7;color:var(--ink);outline:none}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,94,60,.12)}
+button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.submit{background:var(--accent);color:white}.submit:hover{background:var(--dark);transform:translateY(-1px)}
+.hint-button{display:block;margin:16px auto 0;background:transparent;color:var(--muted);text-decoration:underline;padding:8px}.hint-button:hover{color:var(--ink)}
+.hint{display:none;margin:18px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--muted)}
+.feedback{min-height:28px;margin-top:18px;text-align:center;font-weight:bold}.success{color:var(--success)}.error{color:var(--error)}
+.locked{pointer-events:none;opacity:.7}
+.reward{display:none;margin-top:28px;padding-top:24px;border-top:1px solid rgba(47,42,36,.12);text-align:center}
+.reward-text{color:var(--muted)}.reward-letter{font-size:2.6rem;letter-spacing:.12em;margin-top:8px}
+.next-button{display:none;margin:20px auto 0;background:var(--ink);color:white}.next-button:hover{transform:translateY(-1px);background:#1f1c19}
+.final{display:none;text-align:center}.final h2{font-weight:normal;font-size:2rem;margin-top:0}
+.cipher-box{margin:26px auto;padding:18px;background:rgba(139,94,60,.07);border-radius:12px;font-size:1.5rem;letter-spacing:.16em}
+.key-message{margin-top:24px;line-height:1.7}
+@media(max-width:560px){.form{flex-direction:column}.submit{width:100%}}
+</style>
+</head>
+<body>
+<main class="hunt">
+<header class="header">
+<div class="eyebrow">A Birthday Treasure Hunt</div>
+<h1 id="pageTitle">The First Mark</h1>
+<div class="progress" aria-label="Progress"><div id="progressBar" class="progress-bar"></div></div>
+</header>
+
+<section id="card" class="card">
+<div id="stopNumber" class="stop"></div>
+<div id="location" class="location"></div>
+<p id="clue" class="clue"></p>
+
+<form id="answerForm" class="form">
+<input id="answer" type="text" autocomplete="off" spellcheck="false" placeholder="Enter your answer..." aria-label="Answer">
+<button class="submit" type="submit">Submit</button>
+</form>
+
+<button id="hintButton" class="hint-button" type="button">I need a hint</button>
+<div id="hint" class="hint"></div>
+<div id="feedback" class="feedback" aria-live="polite"></div>
+
+<div id="reward" class="reward">
+<div class="reward-text">You found the next letter.</div>
+<div id="rewardLetter" class="reward-letter"></div>
+<button id="nextButton" class="next-button" type="button">Continue the Hunt</button>
+</div>
+</section>
+
+<section id="final" class="card final">
+<div class="eyebrow">The Final Revelation</div>
+<h2>You have all fourteen letters.</h2>
+<p>They are meaningless without the final key. When you reach the finish line, look at the race bib.</p>
+<div class="cipher-box" id="cipherText"></div>
+<p class="key-message">The key written there will reveal what your birthday treasure is.</p>
+</section>
+</main>
+
+<script>
+const clues = [
+{title:"The First Mark",location:"Confederation Fountain",clue:`Where Canada's emblems circle round,
+Seek the odd one out you've found.
+Not crown nor shield, nor shape so known—
+One bears a form entirely its own.
+
+Name the land that broke the mould,
+And claim the letter you are told.`,answer:"nunavut",hint:"Look carefully at the shapes of the coats of arms. One is a circle.",letter:"Q"},
+{title:"The Two Travellers",location:"Demarcating Canada's Western Boundary",clue:`Two little wanderers, cast in bronze,
+Keep watch where old frontiers were drawn.
+Beneath their paws, where histories meet,
+Three tongues recall an older seat.
+
+One name comes east from lands you know,
+And may strike closer than you suppose.
+
+Take the given name of the man
+Whose homeland echoes yours, if you can.`,answer:"petro",hint:"Think Ukrainian.",letter:"Z"},
+{title:"The Lady and Her Companion",location:"Our Emily",clue:`A painter waits upon the street,
+With an unexpected friend so sweet.
+Not canvas, brush, nor work of art
+Will tell you where the next clues start.
+
+The town has given her a name—
+A simple title, known to fame.
+
+Find the words beside her stone,
+And speak the name the city has known.`,answer:"our emily",hint:"The statue's name is written right there.",letter:"K"},
+{title:"The Watcher Above",location:"Mungo Martin House",clue:`Beyond the halls of gathered lore,
+A wooden house keeps ancient score.
+Great carved guardians mark the way,
+And watching eyes are on display.
+
+Seek the grin with teeth so wide,
+Then look upon the pole beside.
+
+What winged creature crowns the sky,
+Resting where the tall carvings lie?`,answer:"eagle",hint:"Look for a bird at the very top.",letter:"M"},
+{title:"The Palace of Fine Dining",location:"Old Spaghetti Factory",clue:`At last, a temple to cuisine—
+The finest feast your eyes have seen.
+A worthy shrine to pasta rare,
+Where critics doubtless stop and stare.
+
+Yet leave the menu on the shelf;
+The answer hides upon the house itself.
+
+Seek the name the building bears,
+Written quietly for those who care.`,answer:"crystal garden",hint:"It's written beside the restaurant, not above its front door.",letter:"X"},
+{title:"The Glowing Gate",location:"Nootka Court",clue:`A glowing sign shall mark the door,
+To a little court you've passed before.
+Do not stray wide, nor wander far—
+Your prize lies close to where you are.
+
+Down the road, then slightly left,
+Look for the entrance brightly dressed.
+
+Beside the light, a number waits.
+What number guards these hidden gates?`,answer:"634",hint:"Use the entrance with the large neon sign. You don't need to go around to the other side.",letter:"S"},
+{title:"The Zoo That Isn't",location:"Bug Zoo",clue:`Within this court there hides a place
+Where many-legged things make their case.
+No lion prowls, no tiger roars,
+Yet still a keeper tends its doors.
+
+Before you enter, look ahead—
+A northern beast stands carved instead.
+
+Name the creature guarding the zoo,
+And let the next secret come to you.`,answer:"beaver",hint:"It is one of Canada's favourite animals—and no, it isn't a giant bug.",letter:"V"},
+{title:"The Sweetest Trail",location:"Bon Macaron Bakery",clue:`A jaunty fellow waits nearby,
+With moustached face and beret so sly.
+Follow the scent of sugar and shell
+To the place where little treasures dwell.
+
+But sweets are not the prize today;
+A number will point you on your way.
+
+Find the shop, then seek its ring—
+Its telephone number is the thing.`,answer:"7782650850",hint:"You don't need to ask anyone. The bakery's phone number is displayed with its shop information.",letter:"Q"},
+{title:"The Temptation",location:"Munro's Books",clue:`Beware the hall of printed dreams,
+Where shelves conceal more books than seems.
+We've entered once with empty hands
+And left with treasures, contrary to plans.
+
+Today, resist—at least for now—
+And turn your gaze outside somehow.
+
+Upon the golden words you'll see
+A year concealed for you and me.
+
+What year first saw this building rise?`,answer:"1909",hint:"Check the large golden plaques just outside.",letter:"H"},
+{title:"The Pilgrimage of Oleh",location:"MEC",clue:`There is a place, revered by one
+Who'd gladly spend his days there for fun.
+Amongst the boots and packs and gear,
+Its name is spoken with great cheer.
+
+One traveller holds this place dearer
+Than any other place in British Columbia.
+
+Seek the letters on its door—
+Three of them will unlock the lore.`,answer:"mec",hint:"Think of Oleh's favourite place in all of BC.",letter:"X"},
+{title:"The Narrow Way",location:"Fan Tan Alley",clue:`Through a passage slim and old,
+Where stories linger, bought and sold,
+Pass not yet beneath the stone—
+First seek a number carved alone.
+
+Across from where the narrow way
+Invites the wandering feet to stray,
+A building keeps the number true.
+
+Which three digits wait for you?`,answer:"595",hint:"Look at the building directly opposite the entrance to the alley.",letter:"G"},
+{title:"The Questionable Concoctions",location:"The Bubble Tea Place",clue:`Beyond the alley, strange potions brew,
+With stranger names for me and you.
+Some are sweet and some obscene,
+And others ought not grace a menu, I deem.
+
+Among the words both wild and plenty,
+One bears no words—just digits only.
+
+Find the name that numbers make,
+And that alone your prize shall take.`,answer:"4-20",hint:"Ignore all the words. Find the drink whose name is made only from numbers and a dash.",letter:"N"},
+{title:"Flowers for a Giant",location:"Tulips for a Giant",clue:`A giant once came through this town,
+And great bright flowers sprang from the ground.
+Some stand proudly, straight and tall,
+While others rest where shadows fall.
+
+Count the living blooms above,
+Then those who ride the boat below.
+
+Two numbers joined shall be your key—
+The flowers' count will set you free.`,answer:"53",hint:"Count the five standing tulips, then the three tulip buds in the canoe.",letter:"Z"},
+{title:"The Hands of Time",location:"Hands of Time",clue:`At the edge of an old brick wall,
+Two hands appear without a call.
+They reach as though to hold or show
+A distant sight that others cannot know.
+
+Follow the wall beside the sea,
+Until the strange pair beckon thee.
+
+What tool do these two hands embrace,
+To spy upon some distant place?`,answer:"binoculars",hint:"You might use them to watch the finish line from a distance.",letter:"H"}
+];
+
+let currentStop=0;
+let completedLetters=[];
+
+const pageTitle=document.getElementById("pageTitle"),stopNumber=document.getElementById("stopNumber"),locationEl=document.getElementById("location"),clueEl=document.getElementById("clue"),progressBar=document.getElementById("progressBar"),answerForm=document.getElementById("answerForm"),answerInput=document.getElementById("answer"),hintButton=document.getElementById("hintButton"),hintEl=document.getElementById("hint"),feedback=document.getElementById("feedback"),reward=document.getElementById("reward"),rewardLetter=document.getElementById("rewardLetter"),nextButton=document.getElementById("nextButton"),card=document.getElementById("card"),final=document.getElementById("final"),cipherText=document.getElementById("cipherText");
+
+function normalizeAnswer(value){
+return value.trim().toLowerCase().replace(/\s+/g," ");
+}
+function loadStop(index){
+const stop=clues[index];
+pageTitle.textContent=stop.title;
+stopNumber.textContent=`Stop ${index+1} of ${clues.length}`;
+locationEl.textContent=stop.location;
+clueEl.textContent=stop.clue;
+hintEl.textContent=stop.hint;
+answerInput.value="";
+answerInput.disabled=false;
+answerForm.classList.remove("locked");
+feedback.textContent="";
+feedback.className="feedback";
+reward.style.display="none";
+nextButton.style.display="none";
+hintEl.style.display="none";
+hintButton.style.display="block";
+hintButton.textContent="I need a hint";
+progressBar.style.width=`${(index/14)*100}%`;
+setTimeout(()=>answerInput.focus(),100);
+}
+answerForm.addEventListener("submit",(event)=>{
+event.preventDefault();
+const stop=clues[currentStop],answer=normalizeAnswer(answerInput.value);
+if(!answer){feedback.textContent="Enter an answer first.";feedback.className="feedback error";return;}
+if(answer===stop.answer){
+feedback.textContent="Correct. The trail continues...";
+feedback.className="feedback success";
+completedLetters.push(stop.letter);
+rewardLetter.textContent=stop.letter;
+reward.style.display="block";
+answerInput.disabled=true;
+answerForm.classList.add("locked");
+hintButton.style.display="none";
+nextButton.textContent=currentStop<clues.length-1?"Continue the Hunt":"See Your Cipher";
+nextButton.style.display="block";
+}else{
+feedback.textContent="Not quite. The trail remains hidden.";
+feedback.className="feedback error";
+}
+});
+hintButton.addEventListener("click",()=>{
+hintEl.style.display="block";
+hintButton.textContent="Hint revealed";
+});
+nextButton.addEventListener("click",()=>{
+currentStop++;
+if(currentStop<clues.length){loadStop(currentStop);}
+else{
+card.style.display="none";
+pageTitle.textContent="The Final Key";
+progressBar.style.width="100%";
+final.style.display="block";
+cipherText.textContent=completedLetters.join("");
+}
+});
+loadStop(0);
+</script>
+</body>
+</html>
