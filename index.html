@@ -32,6 +32,8 @@ button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer
 .lost-wrap{margin-top:32px;padding-top:20px;border-top:1px solid rgba(47,42,36,.12);text-align:center}
 .lost-button{background:transparent;color:var(--muted);border:1px solid rgba(47,42,36,.25);padding:10px 18px;font-size:.95rem}.lost-button:hover{color:var(--ink);border-color:var(--accent)}
 .lost-location{display:none;margin:16px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--accent);font-style:italic}
+.reset-wrap{text-align:center;margin-top:22px}
+.reset-button{background:transparent;color:var(--muted);font-size:.85rem;text-decoration:underline;padding:8px 12px}.reset-button:hover{color:var(--error)}
 .final{display:none;text-align:center}.final h2{font-weight:normal;font-size:2rem;margin-top:0}
 .cipher-box{margin:26px auto;padding:18px;background:rgba(139,94,60,.07);border-radius:12px;font-size:1.5rem;letter-spacing:.16em}
 .key-message{margin-top:24px;line-height:1.7}
@@ -78,6 +80,8 @@ button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer
 <div class="cipher-box" id="cipherText"></div>
 <p class="key-message">The key written there will reveal what your birthday treasure is.</p>
 </section>
+
+<div class="reset-wrap"><button id="resetButton" class="reset-button" type="button">Reset</button></div>
 </main>
 
 <script>
@@ -225,14 +229,54 @@ To spy upon some distant place?`,answer:"binoculars",hint:"You might use them to
 
 let currentStop=0;
 let completedLetters=[];
+let solved=false; // true when the current stop has been answered but "Continue" not yet clicked
+const STORAGE_KEY="birthdayTreasureHuntProgress";
 
-const pageTitle=document.getElementById("pageTitle"),stopNumber=document.getElementById("stopNumber"),lostWrap=document.getElementById("lostWrap"),lostButton=document.getElementById("lostButton"),lostLocation=document.getElementById("lostLocation"),clueEl=document.getElementById("clue"),progressBar=document.getElementById("progressBar"),answerForm=document.getElementById("answerForm"),answerInput=document.getElementById("answer"),hintButton=document.getElementById("hintButton"),hintEl=document.getElementById("hint"),feedback=document.getElementById("feedback"),reward=document.getElementById("reward"),rewardLetter=document.getElementById("rewardLetter"),nextButton=document.getElementById("nextButton"),card=document.getElementById("card"),final=document.getElementById("final"),cipherText=document.getElementById("cipherText");
+function saveProgress(){
+try{localStorage.setItem(STORAGE_KEY,JSON.stringify({currentStop,completedLetters,solved}));}catch(e){}
+}
+function clearProgress(){
+try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+}
+function loadProgress(){
+try{
+const data=JSON.parse(localStorage.getItem(STORAGE_KEY));
+if(data&&Number.isInteger(data.currentStop)&&data.currentStop>=0&&data.currentStop<=clues.length&&Array.isArray(data.completedLetters)){
+currentStop=data.currentStop;
+completedLetters=data.completedLetters;
+solved=!!data.solved&&currentStop<clues.length;
+}
+}catch(e){}
+}
 
+const pageTitle=document.getElementById("pageTitle"),stopNumber=document.getElementById("stopNumber"),lostWrap=document.getElementById("lostWrap"),lostButton=document.getElementById("lostButton"),lostLocation=document.getElementById("lostLocation"),clueEl=document.getElementById("clue"),progressBar=document.getElementById("progressBar"),answerForm=document.getElementById("answerForm"),answerInput=document.getElementById("answer"),hintButton=document.getElementById("hintButton"),hintEl=document.getElementById("hint"),feedback=document.getElementById("feedback"),reward=document.getElementById("reward"),rewardLetter=document.getElementById("rewardLetter"),nextButton=document.getElementById("nextButton"),card=document.getElementById("card"),final=document.getElementById("final"),cipherText=document.getElementById("cipherText"),resetButton=document.getElementById("resetButton");
+
+function showSolved(){
+feedback.textContent="Correct. The trail continues...";
+feedback.className="feedback success";
+rewardLetter.textContent=completedLetters[completedLetters.length-1];
+reward.style.display="block";
+answerInput.disabled=true;
+answerForm.classList.add("locked");
+hintButton.style.display="none";
+lostWrap.style.display="none";
+nextButton.textContent=currentStop<clues.length-1?"Continue the Hunt":"See Your Cipher";
+nextButton.style.display="block";
+}
+function showFinal(){
+card.style.display="none";
+pageTitle.textContent="The Final Key";
+progressBar.style.width="100%";
+final.style.display="block";
+cipherText.textContent=completedLetters.join("");
+}
 function normalizeAnswer(value){
 return value.trim().toLowerCase().replace(/\s+/g," ");
 }
 function loadStop(index){
 const stop=clues[index];
+card.style.display="";
+final.style.display="none";
 pageTitle.textContent=stop.title;
 stopNumber.textContent=`Stop ${index+1} of ${clues.length}`;
 lostLocation.textContent="Your next stop: "+stop.location;
@@ -259,17 +303,10 @@ event.preventDefault();
 const stop=clues[currentStop],answer=normalizeAnswer(answerInput.value);
 if(!answer){feedback.textContent="Enter an answer first.";feedback.className="feedback error";return;}
 if(answer===stop.answer){
-feedback.textContent="Correct. The trail continues...";
-feedback.className="feedback success";
 completedLetters.push(stop.letter);
-rewardLetter.textContent=stop.letter;
-reward.style.display="block";
-answerInput.disabled=true;
-answerForm.classList.add("locked");
-hintButton.style.display="none";
-lostWrap.style.display="none";
-nextButton.textContent=currentStop<clues.length-1?"Continue the Hunt":"See Your Cipher";
-nextButton.style.display="block";
+solved=true;
+saveProgress();
+showSolved();
 }else{
 feedback.textContent="Not quite. The trail remains hidden.";
 feedback.className="feedback error";
@@ -285,16 +322,29 @@ hintButton.textContent="Hint revealed";
 });
 nextButton.addEventListener("click",()=>{
 currentStop++;
+solved=false;
+saveProgress();
 if(currentStop<clues.length){loadStop(currentStop);}
-else{
-card.style.display="none";
-pageTitle.textContent="The Final Key";
-progressBar.style.width="100%";
-final.style.display="block";
-cipherText.textContent=completedLetters.join("");
+else{showFinal();}
+});
+
+resetButton.addEventListener("click",()=>{
+if(confirm("Are you sure you want to reset? All progress will be lost and you'll start over at Stop 1.")){
+currentStop=0;
+completedLetters=[];
+solved=false;
+clearProgress();
+loadStop(0);
 }
 });
-loadStop(0);
+
+// Restore saved progress (if any)
+loadProgress();
+if(currentStop>=clues.length){showFinal();}
+else{
+loadStop(currentStop);
+if(solved){showSolved();}
+}
 </script>
 </body>
 </html>
