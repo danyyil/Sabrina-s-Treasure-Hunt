@@ -32,6 +32,10 @@ button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer
 .lost-wrap{margin-top:32px;padding-top:20px;border-top:1px solid rgba(47,42,36,.12);text-align:center}
 .lost-button{background:transparent;color:var(--muted);border:1px solid rgba(47,42,36,.25);padding:10px 18px;font-size:.95rem}.lost-button:hover{color:var(--ink);border-color:var(--accent)}
 .lost-location{display:none;margin:16px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--accent);font-style:italic}
+.give-up{display:none;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px auto 0}
+.give-up-button{background:transparent;color:var(--muted);border:1px solid rgba(47,42,36,.25);padding:10px 16px;font-size:.95rem}.give-up-button:hover{color:var(--ink);border-color:var(--accent)}
+.answer-reveal{display:none;margin:14px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--ink)}
+.answer-reveal strong{text-transform:capitalize}
 .reset-wrap{text-align:center;margin-top:22px}
 .reset-button{background:transparent;color:var(--muted);font-size:.85rem;text-decoration:underline;padding:8px 12px}.reset-button:hover{color:var(--error)}
 .final{display:none;text-align:center}.final h2{font-weight:normal;font-size:2rem;margin-top:0}
@@ -59,6 +63,11 @@ button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer
 
 <button id="hintButton" class="hint-button" type="button">I need a hint</button>
 <div id="hint" class="hint"></div>
+<div id="giveUp" class="give-up">
+<button id="revealButton" class="give-up-button" type="button">Reveal the answer</button>
+<button id="skipButton" class="give-up-button" type="button">Skip this stop</button>
+</div>
+<div id="answerReveal" class="answer-reveal"></div>
 <div id="feedback" class="feedback" aria-live="polite"></div>
 
 <div id="reward" class="reward">
@@ -75,21 +84,10 @@ button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer
 
 <section id="final" class="card final">
 <div class="eyebrow">The Final Revelation</div>
-<pre>The road behind you now is done,
-The final treasure has begun.
-One last trail lies swift and straight,
-And somewhere there the answers wait.
-
-Do not seek a sign or stone—
-The final clue will be your own.
-
-Race the one who sent you here,
-And at the finish, look quite near.
-
-Upon his bib, the final thread
-Awaits beneath the words you've read.</pre>
+<h2>You have all fourteen letters.</h2>
+<p>They are meaningless without the final key. When you reach the finish line, look at the race bib.</p>
 <div class="cipher-box" id="cipherText"></div>
-<p class="key-message"></p>
+<p class="key-message">The key written there will reveal what your birthday treasure is.</p>
 </section>
 
 <div class="reset-wrap"><button id="resetButton" class="reset-button" type="button">Reset</button></div>
@@ -97,25 +95,13 @@ Awaits beneath the words you've read.</pre>
 
 <script>
 const clues = [
-{title:"The Smallest Sailor",location:"The Baby",clue:`The smallest member of our crew
-Has been entrusted with something for you.
-He cannot walk, he cannot read,
-Yet somehow holds what you now need.
-
-He may complain. He may object.
-He may demand a diaper check.
-
-Seek the sailor, small and round,
-The first secret on him is found.`,answer:"captain stinky",hint:"Inspect him carefully.",letter:"Q"},
-  
 {title:"The First Mark",location:"Confederation Fountain",clue:`Where Canada's emblems circle round,
 Seek the odd one out you've found.
 Not crown nor shield, nor shape so known—
 One bears a form entirely its own.
 
 Name the land that broke the mould,
-And claim the letter you are told.`,answer:"nunavut",hint:"Look carefully at the shapes of the coats of arms. One is a circle.",letter:"H"},
-  
+And claim the letter you are told.`,answer:"nunavut",hint:"Look carefully at the shapes of the coats of arms. One is a circle.",letter:"Q"},
 {title:"The Two Travellers",location:"Demarcating Canada's Western Boundary",clue:`Two little wanderers, cast in bronze,
 Keep watch where old frontiers were drawn.
 Beneath their paws, where histories meet,
@@ -126,17 +112,16 @@ And may strike closer than you suppose.
 
 Take the given name of the man
 Whose homeland echoes yours, if you can.`,answer:"petro",hint:"Think Ukrainian.",letter:"Z"},
-  
-{title:"The Lady and Her Companion",location:"Our Emily Statue",clue:`A painter waits upon the street,
+{title:"The Lady and Her Companion",location:"Our Emily",clue:`A painter waits upon the street,
 With an unexpected friend so sweet.
-But neither brush nor canvas shows
-The name by which this lady goes.
+Not canvas, brush, nor work of art
+Will tell you where the next clues start.
 
-Look not upon the statue's face,
-But seek the words that mark the place.
+The town has given her a name—
+A simple title, known to fame.
 
-Her given name is written there.`,answer:"emily",hint:"The statue's name is written right there.",letter:"B"},
-  
+Find the words beside her stone,
+And speak the name the city has known.`,answer:"our emily",hint:"The statue's name is written right there.",letter:"K"},
 {title:"The Watcher Above",location:"Mungo Martin House",clue:`Beyond the halls of gathered lore,
 A wooden house keeps ancient score.
 Great carved guardians mark the way,
@@ -146,8 +131,7 @@ Seek the grin with teeth so wide,
 Then look upon the pole beside.
 
 What winged creature crowns the sky,
-Resting where the tall carvings lie?`,answer:"eagle",hint:"Look for a bird at the very top.",letter:"H"},
-  
+Resting where the tall carvings lie?`,answer:"eagle",hint:"Look for a bird at the very top.",letter:"M"},
 {title:"The Palace of Fine Dining",location:"Old Spaghetti Factory",clue:`At last, a temple to cuisine—
 The finest feast your eyes have seen.
 A worthy shrine to pasta rare,
@@ -157,19 +141,17 @@ Yet leave the menu on the shelf;
 The answer hides upon the house itself.
 
 Seek the name the building bears,
-Written quietly for those who care.`,answer:"crystal garden",hint:"It's written beside the restaurant, not above its front door.",letter:"D"},
-  
-{title:"The Greatest Little Show",location:"The Miniature Museum",clue:`A world of wonders, shrunk to size,
-Where little kingdoms wait inside.
-A place we know, and know quite well,
-Where tiny stories have tales to tell.
+Written quietly for those who care.`,answer:"crystal garden",hint:"It's written beside the restaurant, not above its front door.",letter:"X"},
+{title:"The Glowing Gate",location:"Nootka Court",clue:`A glowing sign shall mark the door,
+To a little court you've passed before.
+Do not stray wide, nor wander far—
+Your prize lies close to where you are.
 
-Above the door, a promise is made:
+Down the road, then slightly left,
+Look for the entrance brightly dressed.
 
-“The Greatest Little Show on ____.”
-
-Complete the boast, and carry on.`,answer:"earth",hint:"It is right over the entrance.",letter:"U"},
-  
+Beside the light, a number waits.
+What number guards these hidden gates?`,answer:"634",hint:"Use the entrance with the large neon sign. You don't need to go around to the other side.",letter:"S"},
 {title:"The Zoo That Isn't",location:"Bug Zoo",clue:`Within this court there hides a place
 Where many-legged things make their case.
 No lion prowls, no tiger roars,
@@ -179,87 +161,89 @@ Before you enter, look ahead—
 A northern beast stands carved instead.
 
 Name the creature guarding the zoo,
-And let the next secret come to you.`,answer:"beaver",hint:"It is one of Canada's favourite animals—and no, it isn't a giant bug.",letter:"L"},
-  
-{title:"The Sweetest Trail",location:"Bon Macaron Bakery",clue:`A little Frenchman waits nearby,
-With jaunty face and watchful eye.
-He guards a house of sweets so small,
-Where painted treasures line the wall.
+And let the next secret come to you.`,answer:"beaver",hint:"It is one of Canada's favourite animals—and no, it isn't a giant bug.",letter:"V"},
+{title:"The Sweetest Trail",location:"Bon Macaron Bakery",clue:`A jaunty fellow waits nearby,
+With moustached face and beret so sly.
+Follow the scent of sugar and shell
+To the place where little treasures dwell.
 
-Follow the trail of shell and cream,
-And find the shop behind the dream.
+But sweets are not the prize today;
+A number will point you on your way.
 
-But once you reach this sugary place,
-Do not yet stop to taste.
-
-Look for the words that bid you bite.
-What three words are shining bright?`,answer:"take a bite",hint:"Look for a sign that prompts your bite.",letter:"Q"},
-  
+Find the shop, then seek its ring—
+Its telephone number is the thing.`,answer:"7782650850",hint:"You don't need to ask anyone. The bakery's phone number is displayed with its shop information.",letter:"Q"},
 {title:"The Temptation",location:"Munro's Books",clue:`Beware the hall of printed dreams,
 Where shelves conceal more books than seems.
 We've entered once with empty hands
 And left with treasures, contrary to plans.
 
-A bookstore stands before your way—
-A dangerous place for us to stay.
 Today, resist—at least for now—
 And turn your gaze outside somehow.
 
 Upon the golden words you'll see
 A year concealed for you and me.
 
-What year first saw this building rise?`,answer:"1909",hint:"Check the large golden plaques just outside.",letter:"M"},
+What year first saw this building rise?`,answer:"1909",hint:"Check the large golden plaques just outside.",letter:"H"},
+{title:"The Pilgrimage of Oleh",location:"MEC",clue:`There is a place, revered by one
+Who'd gladly spend his days there for fun.
+Amongst the boots and packs and gear,
+Its name is spoken with great cheer.
 
-{title:"The Architect",location:"Irish Times Pub",clue:`Where Irish voices fill an ancient room,
-And dark old timber hides the gloom,
-A stately bank once held the floor
-Where pints are raised there now instead.
+One traveller holds this place dearer
+Than any other place in British Columbia.
 
-The man who drew these walls with care
-Would meet a darker fate elsewhere.
+Seek the letters on its door—
+Three of them will unlock the lore.`,answer:"mec",hint:"Think of Oleh's favourite place in all of BC.",letter:"X"},
+{title:"The Narrow Way",location:"Fan Tan Alley",clue:`Through a passage slim and old,
+Where stories linger, bought and sold,
+Pass not yet beneath the stone—
+First seek a number carved alone.
 
-An architect of some renown,
-Whose buildings still define this town,
+Across from where the narrow way
+Invites the wandering feet to stray,
+A building keeps the number true.
 
-Was murdered far from Canada.
-What was his name?`,answer:"rattenbury",hint:"You may have to ask for a menu to read the story again.",letter:"D"},
+Which three digits wait for you?`,answer:"595",hint:"Look at the building directly opposite the entrance to the alley.",letter:"G"},
+{title:"The Questionable Concoctions",location:"The Bubble Tea Place",clue:`Beyond the alley, strange potions brew,
+With stranger names for me and you.
+Some are sweet and some obscene,
+And others ought not grace a menu, I deem.
 
-{title:"The Birthday Coffee",location:"Starbucks at 819 Wharf Street",clue:`A green siren calls you near,
-With free coffee, birthday cheer.
-But downtown holds more than one,
-So choose the one beside the sun.
+Among the words both wild and plenty,
+One bears no words—just digits only.
 
-Where sailors watch the harbour tide,
-And homecoming waits just by its side,
-Seek the shop where coffee steams—
-Then look beyond the cups and creams.
+Find the name that numbers make,
+And that alone your prize shall take.`,answer:"4-20",hint:"Ignore all the words. Find the drink whose name is made only from numbers and a dash.",letter:"N"},
+{title:"Flowers for a Giant",location:"Tulips for a Giant",clue:`A giant once came through this town,
+And great bright flowers sprang from the ground.
+Some stand proudly, straight and tall,
+While others rest where shadows fall.
 
-Three little figures mark the door.
-What number do they show?`,answer:"819",hint:"Look for a building number, should be nearby.",letter:"S"},
-  
-{title:"The Homecoming",location:"The Homecoming Statue",clue:`A sailor comes home across the sea,
-And finds the arms of family.
+Count the living blooms above,
+Then those who ride the boat below.
 
-A little girl runs out to meet
-The sailor kneeling at her feet.
+Two numbers joined shall be your key—
+The flowers' count will set you free.`,answer:"53",hint:"Count the five standing tulips, then the three tulip buds in the canoe.",letter:"Z"},
+{title:"The Hands of Time",location:"Hands of Time",clue:`At the edge of an old brick wall,
+Two hands appear without a call.
+They reach as though to hold or show
+A distant sight that others cannot know.
 
-Yet do not linger with the pair—
-Another sailor waits nearby.
+Follow the wall beside the sea,
+Until the strange pair beckon thee.
 
-He sits in silence, calm and still,
-Watching over all the while.
-
-Look beneath the sailor's cap.
-What ship's name does he wear?`,answer:"hmcs naden",hint:"All ships names start with HMCS.",letter:"D"}
+What tool do these two hands embrace,
+To spy upon some distant place?`,answer:"binoculars",hint:"You might use them to watch the finish line from a distance.",letter:"H"}
 ];
 
 let currentStop=0;
 let completedLetters=[];
+let skipped=false; // true if the current stop was skipped rather than answered
 let solved=false; // true when the current stop has been answered but "Continue" not yet clicked
 const STORAGE_KEY="birthdayTreasureHuntProgress";
 
 function saveProgress(){
-try{localStorage.setItem(STORAGE_KEY,JSON.stringify({currentStop,completedLetters,solved}));}catch(e){}
+try{localStorage.setItem(STORAGE_KEY,JSON.stringify({currentStop,completedLetters,solved,skipped}));}catch(e){}
 }
 function clearProgress(){
 try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
@@ -271,20 +255,23 @@ if(data&&Number.isInteger(data.currentStop)&&data.currentStop>=0&&data.currentSt
 currentStop=data.currentStop;
 completedLetters=data.completedLetters;
 solved=!!data.solved&&currentStop<clues.length;
+skipped=solved&&!!data.skipped;
 }
 }catch(e){}
 }
 
-const pageTitle=document.getElementById("pageTitle"),stopNumber=document.getElementById("stopNumber"),lostWrap=document.getElementById("lostWrap"),lostButton=document.getElementById("lostButton"),lostLocation=document.getElementById("lostLocation"),clueEl=document.getElementById("clue"),progressBar=document.getElementById("progressBar"),answerForm=document.getElementById("answerForm"),answerInput=document.getElementById("answer"),hintButton=document.getElementById("hintButton"),hintEl=document.getElementById("hint"),feedback=document.getElementById("feedback"),reward=document.getElementById("reward"),rewardLetter=document.getElementById("rewardLetter"),nextButton=document.getElementById("nextButton"),card=document.getElementById("card"),final=document.getElementById("final"),cipherText=document.getElementById("cipherText"),resetButton=document.getElementById("resetButton");
+const pageTitle=document.getElementById("pageTitle"),stopNumber=document.getElementById("stopNumber"),lostWrap=document.getElementById("lostWrap"),lostButton=document.getElementById("lostButton"),lostLocation=document.getElementById("lostLocation"),clueEl=document.getElementById("clue"),progressBar=document.getElementById("progressBar"),answerForm=document.getElementById("answerForm"),answerInput=document.getElementById("answer"),hintButton=document.getElementById("hintButton"),hintEl=document.getElementById("hint"),feedback=document.getElementById("feedback"),reward=document.getElementById("reward"),rewardLetter=document.getElementById("rewardLetter"),nextButton=document.getElementById("nextButton"),card=document.getElementById("card"),final=document.getElementById("final"),cipherText=document.getElementById("cipherText"),resetButton=document.getElementById("resetButton"),giveUp=document.getElementById("giveUp"),revealButton=document.getElementById("revealButton"),skipButton=document.getElementById("skipButton"),answerReveal=document.getElementById("answerReveal");
 
 function showSolved(){
-feedback.textContent="Correct. The trail continues...";
+feedback.textContent=skipped?"Skipped. The trail continues...":"Correct. The trail continues...";
 feedback.className="feedback success";
 rewardLetter.textContent=completedLetters[completedLetters.length-1];
 reward.style.display="block";
 answerInput.disabled=true;
 answerForm.classList.add("locked");
 hintButton.style.display="none";
+giveUp.style.display="none";
+answerReveal.style.display="none";
 lostWrap.style.display="none";
 nextButton.textContent=currentStop<clues.length-1?"Continue the Hunt":"See Your Cipher";
 nextButton.style.display="block";
@@ -321,6 +308,10 @@ nextButton.style.display="none";
 hintEl.style.display="none";
 hintButton.style.display="block";
 hintButton.textContent="I need a hint";
+giveUp.style.display="none";
+revealButton.style.display="inline-block";
+answerReveal.style.display="none";
+answerReveal.innerHTML="";
 progressBar.style.width=`${(index/14)*100}%`;
 setTimeout(()=>answerInput.focus(),100);
 }
@@ -331,6 +322,7 @@ if(!answer){feedback.textContent="Enter an answer first.";feedback.className="fe
 if(answer===stop.answer){
 completedLetters.push(stop.letter);
 solved=true;
+skipped=false;
 saveProgress();
 showSolved();
 }else{
@@ -345,10 +337,28 @@ lostButton.style.display="none";
 hintButton.addEventListener("click",()=>{
 hintEl.style.display="block";
 hintButton.textContent="Hint revealed";
+giveUp.style.display="flex";
+});
+revealButton.addEventListener("click",()=>{
+const strong=document.createElement("strong");
+strong.textContent=clues[currentStop].answer;
+answerReveal.innerHTML="";
+answerReveal.append("The answer is: ",strong);
+answerReveal.style.display="block";
+revealButton.style.display="none";
+});
+skipButton.addEventListener("click",()=>{
+if(!confirm("Skip this stop? You'll still receive its letter.")){return;}
+completedLetters.push(clues[currentStop].letter);
+solved=true;
+skipped=true;
+saveProgress();
+showSolved();
 });
 nextButton.addEventListener("click",()=>{
 currentStop++;
 solved=false;
+skipped=false;
 saveProgress();
 if(currentStop<clues.length){loadStop(currentStop);}
 else{showFinal();}
@@ -359,6 +369,7 @@ if(confirm("Are you sure you want to reset? All progress will be lost and you'll
 currentStop=0;
 completedLetters=[];
 solved=false;
+skipped=false;
 clearProgress();
 loadStop(0);
 }
