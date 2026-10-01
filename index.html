@@ -3,50 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#10263a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <title>The Birthday Treasure Hunt</title>
 <style>
-:root{--paper:#f4ecd8;--ink:#2f2a24;--muted:#746b5f;--accent:#8b5e3c;--dark:#6d472d;--success:#3e6848;--error:#8a4038;--card:rgba(255,252,242,.94)}
+:root{--sea:#10263a;--sea2:#1a4560;--parch:#efe0bb;--parch2:#dcc48e;--ink:#2b2118;--muted:#6b563a;--brass:#b98a3b;--brass-d:#7f5c1c;--brass-l:#e8c477;--teal:#25686b;--wax:#8c2f2a;--ok:#2f6b45;--err:#9a3a2e;
+--noise:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/><feColorMatrix values='0 0 0 0 .4 0 0 0 0 .3 0 0 0 0 .15 0 0 0 .13 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+--waves:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='40'><path d='M0 20 Q15 8 30 20 T60 20 T90 20 T120 20' fill='none' stroke='white' stroke-opacity='.06' stroke-width='1.5'/></svg>")}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;background:radial-gradient(circle at top,rgba(255,255,255,.45),transparent 40%),linear-gradient(135deg,#e7dcc3,#f2ead8 45%,#ddd0b5);color:var(--ink);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center;align-items:center;padding:24px}
-.hunt{width:min(720px,100%)}
-.header{text-align:center;margin-bottom:18px}
-.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:.75rem;color:var(--muted);margin-bottom:8px}
-h1{margin:0;font-size:clamp(2rem,5vw,3.2rem);font-weight:normal}
-.progress{margin:20px 0 0;height:8px;border-radius:999px;background:rgba(47,42,36,.13);overflow:hidden}
-.progress-bar{width:0;height:100%;background:var(--accent);border-radius:inherit;transition:width .5s ease}
-.card{background:var(--card);border:1px solid rgba(47,42,36,.12);border-radius:18px;padding:clamp(28px,5vw,48px);box-shadow:0 18px 50px rgba(63,52,37,.14);backdrop-filter:blur(4px)}
-.stop{text-align:center;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.clue{font-size:clamp(1.15rem,2.3vw,1.35rem);line-height:1.85;white-space:pre-line;max-width:600px;margin:0 auto 30px}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;min-height:100dvh;display:flex;color:var(--ink);font-family:"IM Fell English",Georgia,"Times New Roman",serif;background:var(--waves),radial-gradient(ellipse at top,var(--sea2) 0,transparent 65%),var(--sea);padding:max(18px,env(safe-area-inset-top)) 14px max(26px,env(safe-area-inset-bottom))}
+.hunt{width:min(680px,100%);margin:auto}
+.header{text-align:center;margin-bottom:26px;color:var(--parch)}
+.compass{width:64px;height:64px;display:block;margin:0 auto 10px}
+.needle{transform-origin:50px 50px;animation:settle 1.8s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes settle{0%{transform:rotate(-80deg)}100%{transform:rotate(0)}}
+.eyebrow{font-style:italic;font-size:1.05rem;color:rgba(239,224,187,.72);margin-bottom:4px}
+h1{margin:0;font-family:"IM Fell English SC",Georgia,serif;font-weight:normal;font-size:clamp(1.9rem,8vw,3rem);line-height:1.15;letter-spacing:.02em;text-shadow:0 2px 6px rgba(0,0,0,.5)}
+.progress{position:relative;height:5px;margin:24px 16px 0 6px;background:repeating-linear-gradient(90deg,rgba(239,224,187,.4) 0 8px,transparent 8px 14px)}
+.progress::after{content:"\2715";position:absolute;right:-16px;top:50%;transform:translateY(-52%);color:var(--wax);background:var(--parch);border-radius:50%;width:20px;height:20px;line-height:20px;font-size:.8rem;text-align:center;font-family:Georgia,serif}
+.progress-bar{position:relative;width:0;height:100%;background:var(--brass-l);transition:width .6s ease}
+.progress-bar::after{content:"";position:absolute;right:-7px;top:-5px;width:15px;height:15px;border-radius:50%;background:var(--brass-l);box-shadow:0 0 0 3px var(--sea),0 0 10px rgba(232,196,119,.6)}
+.card{position:relative;background:var(--noise),radial-gradient(ellipse at center,#f6ebcd 0,var(--parch) 62%,var(--parch2) 100%);border-radius:5px;padding:clamp(28px,6vw,52px) clamp(20px,6vw,46px);box-shadow:0 0 0 3px var(--brass-d),0 0 0 5px #0a1824,0 22px 50px rgba(0,0,0,.5),inset 0 0 70px rgba(120,80,30,.3)}
+.card::before{content:"";position:absolute;inset:9px;border:1px solid rgba(90,62,30,.4);border-radius:3px;pointer-events:none}
+.card .eyebrow{color:var(--muted)}
+.stop{text-align:center;font-style:italic;font-size:1.05rem;color:var(--muted);margin-bottom:16px}
+.clue{font-size:clamp(1.18rem,4.6vw,1.38rem);line-height:1.7;white-space:pre-line;text-align:center;max-width:30em;margin:0 auto 28px}
 .form{display:flex;gap:10px;max-width:520px;margin:0 auto}
-input{flex:1;min-width:0;padding:14px 16px;border:1px solid rgba(47,42,36,.25);border-radius:10px;font:inherit;font-size:1rem;background:#fffdf7;color:var(--ink);outline:none}
-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,94,60,.12)}
-button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer;transition:transform .15s ease,background .15s ease}
-.submit{background:var(--accent);color:white}.submit:hover{background:var(--dark);transform:translateY(-1px)}
-.hint-button{display:block;margin:16px auto 0;background:transparent;color:var(--muted);text-decoration:underline;padding:8px}.hint-button:hover{color:var(--ink)}
-.hint{display:none;margin:18px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--muted)}
-.feedback{min-height:28px;margin-top:18px;text-align:center;font-weight:bold}.success{color:var(--success)}.error{color:var(--error)}
-.locked{pointer-events:none;opacity:.7}
-.reward{display:none;margin-top:28px;padding-top:24px;border-top:1px solid rgba(47,42,36,.12);text-align:center}
-.reward-text{color:var(--muted)}.reward-letter{font-size:2.6rem;letter-spacing:.12em;margin-top:8px}
-.next-button{display:none;margin:20px auto 0;background:var(--ink);color:white}.next-button:hover{transform:translateY(-1px);background:#1f1c19}
-.lost-wrap{margin-top:32px;padding-top:20px;border-top:1px solid rgba(47,42,36,.12);text-align:center}
-.lost-button{background:transparent;color:var(--muted);border:1px solid rgba(47,42,36,.25);padding:10px 18px;font-size:.95rem}.lost-button:hover{color:var(--ink);border-color:var(--accent)}
-.lost-location{display:none;margin:16px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--accent);font-style:italic}
-.give-up{display:none;justify-content:center;gap:12px;flex-wrap:wrap;margin:14px auto 0}
-.give-up-button{background:transparent;color:var(--muted);border:1px solid rgba(47,42,36,.25);padding:10px 16px;font-size:.95rem}.give-up-button:hover{color:var(--ink);border-color:var(--accent)}
-.answer-reveal{display:none;margin:14px auto 0;padding:14px 16px;max-width:520px;border-left:3px solid var(--accent);background:rgba(139,94,60,.07);text-align:left;line-height:1.6;color:var(--ink)}
-.answer-reveal strong{text-transform:capitalize}
+input{flex:1;min-width:0;padding:13px 14px;border:1px solid rgba(90,62,30,.55);border-radius:4px;font:inherit;font-size:1.1rem;background:rgba(255,250,235,.75);color:var(--ink);outline:none}
+input:focus{border-color:var(--brass-d);box-shadow:0 0 0 3px rgba(185,138,59,.3)}
+input::placeholder{color:rgba(107,86,58,.7);font-style:italic}
+button{border:0;border-radius:4px;padding:13px 20px;min-height:46px;font:inherit;font-size:1.05rem;cursor:pointer;transition:background .15s ease}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.submit{background:var(--sea);color:var(--parch);box-shadow:inset 0 0 0 1px var(--brass)}
+.submit:hover{background:var(--sea2)}
+.hint-button{display:block;margin:12px auto 0;background:transparent;color:var(--muted);text-decoration:underline;font-style:italic;padding:10px}
+.hint-button:hover{color:var(--ink)}
+.hint,.answer-reveal,.lost-location{display:none;margin:16px auto 0;padding:13px 16px;max-width:520px;border-left:3px solid var(--brass);background:rgba(120,80,30,.1);text-align:left;line-height:1.55;font-size:1.08rem}
+.hint{color:var(--muted);font-style:italic}
+.lost-location{color:var(--teal);font-style:italic}
+.answer-reveal strong{text-transform:capitalize;font-weight:normal;font-size:1.2em}
+.give-up{display:none;justify-content:center;gap:10px;flex-wrap:wrap;margin:12px auto 0}
+.give-up-button,.lost-button{background:transparent;color:var(--muted);border:1px solid rgba(90,62,30,.5);padding:10px 16px;font-style:italic}
+.give-up-button:hover,.lost-button:hover{color:var(--ink);background:rgba(120,80,30,.1)}
+.feedback{min-height:28px;margin-top:16px;text-align:center;font-style:italic;font-size:1.1rem}
+.success{color:var(--ok)}.error{color:var(--err)}
+.locked{pointer-events:none;opacity:.6}
+.reward{display:none;margin-top:24px;padding-top:22px;border-top:1px dashed rgba(90,62,30,.5);text-align:center}
+.reward-text{color:var(--muted);font-style:italic}
+.reward-letter{width:92px;height:92px;margin:14px auto 0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"IM Fell English SC",Georgia,serif;font-size:2.7rem;color:#f2cdbd;background:radial-gradient(circle at 35% 30%,#b8453d,var(--wax) 55%,#5a1d19);box-shadow:inset 0 0 0 4px rgba(0,0,0,.12),inset 0 0 0 7px rgba(255,220,200,.12),0 5px 12px rgba(60,20,10,.5);text-shadow:0 -1px 0 rgba(0,0,0,.45),0 1px 0 rgba(255,200,180,.3);animation:stamp .45s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes stamp{from{transform:scale(1.7) rotate(-14deg);opacity:0}to{transform:none;opacity:1}}
+.next-button{display:none;margin:22px auto 0;background:var(--sea);color:var(--parch);box-shadow:inset 0 0 0 1px var(--brass)}
+.next-button:hover{background:var(--sea2)}
+.lost-wrap{margin-top:30px;padding-top:18px;border-top:1px dashed rgba(90,62,30,.5);text-align:center}
+.final{display:none;text-align:center}
+.final h2{font-family:"IM Fell English SC",Georgia,serif;font-weight:normal;font-size:clamp(1.6rem,6vw,2.1rem);margin:6px 0 14px}
+.final p{line-height:1.65;font-size:1.15rem;margin:0 auto;max-width:30em}
+.cipher-box{margin:26px auto;padding:18px 14px;background:#1a1510;color:var(--brass-l);border:1px solid var(--brass);border-radius:4px;font-family:"IM Fell English SC",Georgia,serif;font-size:clamp(1.3rem,6.4vw,1.9rem);letter-spacing:.16em;overflow-wrap:anywhere;box-shadow:inset 0 0 20px rgba(0,0,0,.6)}
+.key-message{margin-top:22px}
 .reset-wrap{text-align:center;margin-top:22px}
-.reset-button{background:transparent;color:var(--muted);font-size:.85rem;text-decoration:underline;padding:8px 12px}.reset-button:hover{color:var(--error)}
-.final{display:none;text-align:center}.final h2{font-weight:normal;font-size:2rem;margin-top:0}
-.cipher-box{margin:26px auto;padding:18px;background:rgba(139,94,60,.07);border-radius:12px;font-size:1.5rem;letter-spacing:.16em}
-.key-message{margin-top:24px;line-height:1.7}
-@media(max-width:560px){.form{flex-direction:column}.submit{width:100%}}
+.reset-button{background:transparent;color:rgba(239,224,187,.6);font-size:.95rem;font-style:italic;text-decoration:underline;padding:10px 14px}
+.reset-button:hover{color:var(--parch)}
+@media(max-width:560px){body{padding-left:10px;padding-right:10px}.form{flex-direction:column}.submit{width:100%}.give-up-button{flex:1 1 100%}.card::before{inset:7px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 <main class="hunt">
 <header class="header">
+<svg class="compass" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="45" fill="none" stroke="#b98a3b" stroke-width="2.5"/><circle cx="50" cy="50" r="38" fill="none" stroke="#b98a3b" stroke-width="1" stroke-dasharray="2 4"/><path d="M50 8 L57 43 L92 50 L57 57 L50 92 L43 57 L8 50 L43 43Z" fill="rgba(185,138,59,.3)" stroke="#b98a3b" stroke-width="1.5" stroke-linejoin="round"/><g class="needle"><path d="M50 16 L56 50 L44 50Z" fill="#c0453b"/><path d="M50 84 L56 50 L44 50Z" fill="#efe0bb"/></g><circle cx="50" cy="50" r="4" fill="#e8c477"/></svg>
 <div class="eyebrow">A Birthday Treasure Hunt</div>
 <h1 id="pageTitle">The First Mark</h1>
 <div class="progress" aria-label="Progress"><div id="progressBar" class="progress-bar"></div></div>
@@ -95,13 +122,25 @@ button{border:0;border-radius:10px;padding:14px 20px;font:inherit;cursor:pointer
 
 <script>
 const clues = [
+{title:"The Smallest Sailor",location:"The Baby",clue:`The smallest member of our crew
+Has been entrusted with something for you.
+He cannot walk, he cannot read,
+Yet somehow holds what you now need.
+
+He may complain. He may object.
+He may demand a diaper check.
+
+Seek the sailor, small and round,
+The first secret on him is found.`,answer:"captain stinky",hint:"Inspect him carefully.",letter:"Q"},
+  
 {title:"The First Mark",location:"Confederation Fountain",clue:`Where Canada's emblems circle round,
 Seek the odd one out you've found.
 Not crown nor shield, nor shape so known—
 One bears a form entirely its own.
 
 Name the land that broke the mould,
-And claim the letter you are told.`,answer:"nunavut",hint:"Look carefully at the shapes of the coats of arms. One is a circle.",letter:"Q"},
+And claim the letter you are told.`,answer:"nunavut",hint:"Look carefully at the shapes of the coats of arms. One is a circle.",letter:"H"},
+  
 {title:"The Two Travellers",location:"Demarcating Canada's Western Boundary",clue:`Two little wanderers, cast in bronze,
 Keep watch where old frontiers were drawn.
 Beneath their paws, where histories meet,
@@ -112,16 +151,17 @@ And may strike closer than you suppose.
 
 Take the given name of the man
 Whose homeland echoes yours, if you can.`,answer:"petro",hint:"Think Ukrainian.",letter:"Z"},
-{title:"The Lady and Her Companion",location:"Our Emily",clue:`A painter waits upon the street,
+  
+{title:"The Lady and Her Companion",location:"Our Emily Statue",clue:`A painter waits upon the street,
 With an unexpected friend so sweet.
-Not canvas, brush, nor work of art
-Will tell you where the next clues start.
+But neither brush nor canvas shows
+The name by which this lady goes.
 
-The town has given her a name—
-A simple title, known to fame.
+Look not upon the statue's face,
+But seek the words that mark the place.
 
-Find the words beside her stone,
-And speak the name the city has known.`,answer:"our emily",hint:"The statue's name is written right there.",letter:"K"},
+Her given name is written there.`,answer:"emily",hint:"The statue's name is written right there.",letter:"B"},
+  
 {title:"The Watcher Above",location:"Mungo Martin House",clue:`Beyond the halls of gathered lore,
 A wooden house keeps ancient score.
 Great carved guardians mark the way,
@@ -131,7 +171,8 @@ Seek the grin with teeth so wide,
 Then look upon the pole beside.
 
 What winged creature crowns the sky,
-Resting where the tall carvings lie?`,answer:"eagle",hint:"Look for a bird at the very top.",letter:"M"},
+Resting where the tall carvings lie?`,answer:"eagle",hint:"Look for a bird at the very top.",letter:"H"},
+  
 {title:"The Palace of Fine Dining",location:"Old Spaghetti Factory",clue:`At last, a temple to cuisine—
 The finest feast your eyes have seen.
 A worthy shrine to pasta rare,
@@ -141,17 +182,19 @@ Yet leave the menu on the shelf;
 The answer hides upon the house itself.
 
 Seek the name the building bears,
-Written quietly for those who care.`,answer:"crystal garden",hint:"It's written beside the restaurant, not above its front door.",letter:"X"},
-{title:"The Glowing Gate",location:"Nootka Court",clue:`A glowing sign shall mark the door,
-To a little court you've passed before.
-Do not stray wide, nor wander far—
-Your prize lies close to where you are.
+Written quietly for those who care.`,answer:"crystal garden",hint:"It's written beside the restaurant, not above its front door.",letter:"D"},
+  
+{title:"The Greatest Little Show",location:"The Miniature Museum",clue:`A world of wonders, shrunk to size,
+Where little kingdoms wait inside.
+A place we know, and know quite well,
+Where tiny stories have tales to tell.
 
-Down the road, then slightly left,
-Look for the entrance brightly dressed.
+Above the door, a promise is made:
 
-Beside the light, a number waits.
-What number guards these hidden gates?`,answer:"634",hint:"Use the entrance with the large neon sign. You don't need to go around to the other side.",letter:"S"},
+“The Greatest Little Show on ____.”
+
+Complete the boast, and carry on.`,answer:"earth",hint:"It is right over the entrance.",letter:"U"},
+  
 {title:"The Zoo That Isn't",location:"Bug Zoo",clue:`Within this court there hides a place
 Where many-legged things make their case.
 No lion prowls, no tiger roars,
@@ -161,79 +204,78 @@ Before you enter, look ahead—
 A northern beast stands carved instead.
 
 Name the creature guarding the zoo,
-And let the next secret come to you.`,answer:"beaver",hint:"It is one of Canada's favourite animals—and no, it isn't a giant bug.",letter:"V"},
-{title:"The Sweetest Trail",location:"Bon Macaron Bakery",clue:`A jaunty fellow waits nearby,
-With moustached face and beret so sly.
-Follow the scent of sugar and shell
-To the place where little treasures dwell.
+And let the next secret come to you.`,answer:"beaver",hint:"It is one of Canada's favourite animals—and no, it isn't a giant bug.",letter:"L"},
+  
+{title:"The Sweetest Trail",location:"Bon Macaron Bakery",clue:`A little Frenchman waits nearby,
+With jaunty face and watchful eye.
+He guards a house of sweets so small,
+Where painted treasures line the wall.
 
-But sweets are not the prize today;
-A number will point you on your way.
+Follow the trail of shell and cream,
+And find the shop behind the dream.
 
-Find the shop, then seek its ring—
-Its telephone number is the thing.`,answer:"7782650850",hint:"You don't need to ask anyone. The bakery's phone number is displayed with its shop information.",letter:"Q"},
+But once you reach this sugary place,
+Do not yet stop to taste.
+
+Look for the words that bid you bite.
+What three words are shining bright?`,answer:"take a bite",hint:"Look for a sign that prompts your bite.",letter:"Q"},
+  
 {title:"The Temptation",location:"Munro's Books",clue:`Beware the hall of printed dreams,
 Where shelves conceal more books than seems.
 We've entered once with empty hands
 And left with treasures, contrary to plans.
 
+A bookstore stands before your way—
+A dangerous place for us to stay.
 Today, resist—at least for now—
 And turn your gaze outside somehow.
 
 Upon the golden words you'll see
 A year concealed for you and me.
 
-What year first saw this building rise?`,answer:"1909",hint:"Check the large golden plaques just outside.",letter:"H"},
-{title:"The Pilgrimage of Oleh",location:"MEC",clue:`There is a place, revered by one
-Who'd gladly spend his days there for fun.
-Amongst the boots and packs and gear,
-Its name is spoken with great cheer.
+What year first saw this building rise?`,answer:"1909",hint:"Check the large golden plaques just outside.",letter:"M"},
 
-One traveller holds this place dearer
-Than any other place in British Columbia.
+{title:"The Architect",location:"Irish Times Pub",clue:`Where Irish voices fill an ancient room,
+And dark old timber hides the gloom,
+A stately bank once held the floor
+Where pints are raised there now instead.
 
-Seek the letters on its door—
-Three of them will unlock the lore.`,answer:"mec",hint:"Think of Oleh's favourite place in all of BC.",letter:"X"},
-{title:"The Narrow Way",location:"Fan Tan Alley",clue:`Through a passage slim and old,
-Where stories linger, bought and sold,
-Pass not yet beneath the stone—
-First seek a number carved alone.
+The man who drew these walls with care
+Would meet a darker fate elsewhere.
 
-Across from where the narrow way
-Invites the wandering feet to stray,
-A building keeps the number true.
+An architect of some renown,
+Whose buildings still define this town,
 
-Which three digits wait for you?`,answer:"595",hint:"Look at the building directly opposite the entrance to the alley.",letter:"G"},
-{title:"The Questionable Concoctions",location:"The Bubble Tea Place",clue:`Beyond the alley, strange potions brew,
-With stranger names for me and you.
-Some are sweet and some obscene,
-And others ought not grace a menu, I deem.
+Was murdered far from Canada.
+What was his name?`,answer:"rattenbury",hint:"You may have to ask for a menu to read the story again.",letter:"D"},
 
-Among the words both wild and plenty,
-One bears no words—just digits only.
+{title:"The Birthday Coffee",location:"Starbucks at 819 Wharf Street",clue:`A green siren calls you near,
+With free coffee, birthday cheer.
+But downtown holds more than one,
+So choose the one beside the sun.
 
-Find the name that numbers make,
-And that alone your prize shall take.`,answer:"4-20",hint:"Ignore all the words. Find the drink whose name is made only from numbers and a dash.",letter:"N"},
-{title:"Flowers for a Giant",location:"Tulips for a Giant",clue:`A giant once came through this town,
-And great bright flowers sprang from the ground.
-Some stand proudly, straight and tall,
-While others rest where shadows fall.
+Where sailors watch the harbour tide,
+And homecoming waits just by its side,
+Seek the shop where coffee steams—
+Then look beyond the cups and creams.
 
-Count the living blooms above,
-Then those who ride the boat below.
+Three little figures mark the door.
+What number do they show?`,answer:"819",hint:"Look for a building number, should be nearby.",letter:"S"},
+  
+{title:"The Homecoming",location:"The Homecoming Statue",clue:`A sailor comes home across the sea,
+And finds the arms of family.
 
-Two numbers joined shall be your key—
-The flowers' count will set you free.`,answer:"53",hint:"Count the five standing tulips, then the three tulip buds in the canoe.",letter:"Z"},
-{title:"The Hands of Time",location:"Hands of Time",clue:`At the edge of an old brick wall,
-Two hands appear without a call.
-They reach as though to hold or show
-A distant sight that others cannot know.
+A little girl runs out to meet
+The sailor kneeling at her feet.
 
-Follow the wall beside the sea,
-Until the strange pair beckon thee.
+Yet do not linger with the pair—
+Another sailor waits nearby.
 
-What tool do these two hands embrace,
-To spy upon some distant place?`,answer:"binoculars",hint:"You might use them to watch the finish line from a distance.",letter:"H"}
+He sits in silence, calm and still,
+Watching over all the while.
+
+Look beneath the sailor's cap.
+What ship's name does he wear?`,answer:"hmcs naden",hint:"All ships names start with HMCS.",letter:"D"}
 ];
 
 let currentStop=0;
